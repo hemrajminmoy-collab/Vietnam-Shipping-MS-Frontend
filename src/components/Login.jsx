@@ -54,8 +54,8 @@ export default function Login({ onLogin }) {
           <button type="submit">Login</button>
 
           <div className="hint">
-            <p>Username: <b>admin</b></p>
-            <p>Password: <b>admin123</b></p>
+            {/* <p>Username: <b>admin</b></p>
+            <p>Password: <b>admin123</b></p> */}
           </div>
         </form>
       </div>
