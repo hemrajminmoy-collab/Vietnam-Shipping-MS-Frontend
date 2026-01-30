@@ -5,15 +5,13 @@ import "./BulkShipment.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 export default function BulkShipmentForm() {
-
-const fetchUID = async () => {
-  const res = await axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/generate-uid");
-  return res.data.uid;
-};
-
-
+  const fetchUID = async () => {
+    const res = await axios.get(
+      "https://vietnam-shipping-ms-backend-six.vercel.app/api/generate-uid",
+    );
+    return res.data.uid;
+  };
 
   // 1. Specific Containers State
   const [containers, setContainers] = useState([
@@ -42,6 +40,7 @@ const fetchUID = async () => {
     eta: "",
     pricePerKgUsd: 0,
     exchangeRate: 24500,
+    countryOfOrigin: "",
   });
 
   //   const [products, setProducts] = useState([]);
@@ -64,7 +63,6 @@ const fetchUID = async () => {
 
   // Handler: Add a new container row
   const addContainerRow = async () => {
-
     const uid = await fetchUID();
 
     setContainers([
@@ -90,15 +88,15 @@ const fetchUID = async () => {
   useEffect(() => {
     const totalGross = containers.reduce(
       (sum, c) => sum + (Number(c.grossWeight) || 0),
-      0
+      0,
     );
     const totalNet = containers.reduce(
       (sum, c) => sum + (Number(c.netWeight) || 0),
-      0
+      0,
     );
     const totalBags = containers.reduce(
       (sum, c) => sum + (Number(c.noOfBags) || 0),
-      0
+      0,
     );
 
     setShipmentData((prev) => ({
@@ -107,14 +105,12 @@ const fetchUID = async () => {
       netWeight: totalNet,
       noOfBags: totalBags,
     }));
-    
-
   }, [containers, shipmentData.pricePerKgUsd, shipmentData.exchangeRate]);
 
   // Handler: Update specific container field
   const updateContainer = (id, field, value) => {
     setContainers(
-      containers.map((c) => (c.id === id ? { ...c, [field]: value } : c))
+      containers.map((c) => (c.id === id ? { ...c, [field]: value } : c)),
     );
   };
 
@@ -127,23 +123,28 @@ const fetchUID = async () => {
     };
 
     try {
-      await axios.post("https://vietnam-shipping-ms-backend-six.vercel.app/api/shipment/bulk", payload);
+      await axios.post(
+        "https://vietnam-shipping-ms-backend-six.vercel.app/api/shipment/bulk",
+        payload,
+      );
+      console.log("countryOfOrigin:", shipmentData.countryOfOrigin);
       toast.success("Shipment submitted successfully!", {
-      position: "top-right",
-      autoClose: 3000,
-      theme: "colored",
-    });
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
     } catch (err) {
       toast.error("Failed to submit shipment", {
-      position: "top-right",
-      autoClose: 3000,
-      theme: "colored",})
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
     }
   };
 
   return (
     <div className="shipment-card">
-    <ToastContainer />
+      <ToastContainer />
       <h2 className="shipment-title">New Shipment & Container Entry</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-section mt-8">
@@ -173,7 +174,7 @@ const fetchUID = async () => {
                       updateContainer(
                         container.id,
                         "containerNumber",
-                        e.target.value
+                        e.target.value,
                       )
                     }
                   />
@@ -209,7 +210,7 @@ const fetchUID = async () => {
                       updateContainer(
                         container.id,
                         "grossWeight",
-                        e.target.value
+                        e.target.value,
                       )
                     }
                   />
@@ -301,29 +302,29 @@ const fetchUID = async () => {
               </div>
 
               {/* Goods Dropdown */}
-<select
-  className="select-field"
-  value={shipmentData.goodsName || ""}
-  onChange={(e) =>
-    setShipmentData({
-      ...shipmentData,
-      goodsName: e.target.value,
-    })
-  }
->
-  <option value="">Select Goods</option>
+              <select
+                className="select-field"
+                value={shipmentData.goodsName || ""}
+                onChange={(e) =>
+                  setShipmentData({
+                    ...shipmentData,
+                    goodsName: e.target.value,
+                  })
+                }
+              >
+                <option value="">Select Goods</option>
 
-  <option value="Rice 5%">Rice 5%</option>
-  <option value="Rice 15%">Rice 15%</option>
-  <option value="Rice 100%">Rice 100%</option>
-  <option value="Rice Reject">Rice Reject</option>
+                <option value="Rice 5%">Rice 5%</option>
+                <option value="Rice 15%">Rice 15%</option>
+                <option value="Rice 100%">Rice 100%</option>
+                <option value="Rice Reject">Rice Reject</option>
 
-  <option value="DORB">DORB</option>
-  <option value="DORB Grade 1">DORB GRADE 1</option>
-  <option value="DORB Grade 2">DORB GRADE 2</option>
+                <option value="DORB">DORB</option>
+                <option value="DORB Grade 1">DORB GRADE 1</option>
+                <option value="DORB Grade 2">DORB GRADE 2</option>
 
-  <option value="DDGS">DDGS</option>
-</select>
+                <option value="DDGS">DDGS</option>
+              </select>
 
               {/* Shipping Line Dropdown */}
               <select
@@ -343,7 +344,25 @@ const fetchUID = async () => {
                 <option value="Hapag-Lloyd">Hapag-Lloyd</option>
               </select>
 
-                {/* <label>Total Gross Weight</label> */}
+              <select
+                className="select-field"
+                required
+                value={shipmentData.countryOfOrigin}
+                onChange={(e) =>
+                  setShipmentData({
+                    ...shipmentData,
+                    countryOfOrigin: e.target.value,
+                  })
+                }
+              >
+                <option value="">Select Country</option>
+                <option value="Channai">Channai</option>
+                <option value="INDIA">INDIA</option>
+                <option value="SA CGM">SA</option>
+                <option value="Afica">Afica</option>
+              </select>
+
+              {/* <label>Total Gross Weight</label> */}
               <div className="floating-input">
                 <span className="title-input">Gross Weight</span>
                 <input value={shipmentData.grossWeight} readOnly required />

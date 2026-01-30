@@ -324,3 +324,17 @@
   max-height: 80vh; /* Prevents window from being taller than screen */
   overflow-y: auto;
 }
+.select-all-btn {
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.select-all-btn:hover {
+  background: #e0e7ff;
+}

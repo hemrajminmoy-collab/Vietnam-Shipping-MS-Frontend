@@ -29,7 +29,7 @@ export default function ContainerList() {
     setLoading(true);
     try {
       const res = await axios.get(
-        `https://vietnam-shipping-ms-backend-six.vercel.app/api/shipment/all?page=${pageNumber}&limit=${LIMIT}`
+        `https://vietnam-shipping-ms-backend-six.vercel.app/api/shipment/all?page=${pageNumber}&limit=${LIMIT}`,
       );
 
       if (res.data.length < LIMIT) {
@@ -55,10 +55,22 @@ export default function ContainerList() {
 
   const toggleContainer = (uid) => {
     setSelectedContainers((prev) =>
-      prev.includes(uid)
-        ? prev.filter((id) => id !== uid)
-        : [...prev, uid]
+      prev.includes(uid) ? prev.filter((id) => id !== uid) : [...prev, uid],
     );
+  };
+
+  const toggleSelectAllContainers = (containers) => {
+    const allSelected = containers.every((c) => selectedContainers.includes(c));
+
+    if (allSelected) {
+      // ❌ Unselect all of this shipment
+      setSelectedContainers((prev) =>
+        prev.filter((c) => !containers.includes(c)),
+      );
+    } else {
+      // ✅ Select all of this shipment
+      setSelectedContainers((prev) => [...new Set([...prev, ...containers])]);
+    }
   };
 
   const closeModal = () => {
@@ -125,6 +137,18 @@ export default function ContainerList() {
                           {/* Containers */}
                           <div className="container-id-section">
                             <h4>Select Containers</h4>
+                            <button
+                              className="select-all-btn"
+                              onClick={() =>
+                                toggleSelectAllContainers(s.containerNumber)
+                              }
+                            >
+                              {s.containerNumber.every((c) =>
+                                selectedContainers.includes(c),
+                              )
+                                ? "Unselect All"
+                                : "Select All"}
+                            </button>
 
                             {s.containerNumber.map((uid) => (
                               <label
@@ -180,16 +204,10 @@ export default function ContainerList() {
       {/* 🔹 BULK EXPENSE MODAL */}
       {showExpenseModal && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div
-            className="modal-window"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="modal-window" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Add Bulk Expense</h3>
-              <button
-                className="modal-close-icon"
-                onClick={closeModal}
-              >
+              <button className="modal-close-icon" onClick={closeModal}>
                 ×
               </button>
             </div>
