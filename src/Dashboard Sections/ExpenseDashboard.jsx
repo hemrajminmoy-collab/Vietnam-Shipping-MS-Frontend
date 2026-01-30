@@ -64,6 +64,7 @@ export default function ExpenseDashboard() {
   return (
     <div className="expense-dashboard">
       <h2 className="page-title">Expense Dashboard</h2>
+      <h1></h1>
 
       {/* SUMMARY CARDS */}
       <div className="summary-grid">
