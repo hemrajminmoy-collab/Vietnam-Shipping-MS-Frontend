@@ -48,7 +48,7 @@ export default function BulkShipmentForm() {
   //   useEffect(() => {
   //     // Fetch product master for the dropdown
   //     const fetchProducts = async () => {
-  //       const res = await axios.get('http://localhost:5000/api/products');
+  //       const res = await axios.get('https://vietnam-shipping-ms-backend-six.vercel.app/api/products');
   //       setProducts(res.data);
   //     };
   //     fetchProducts();

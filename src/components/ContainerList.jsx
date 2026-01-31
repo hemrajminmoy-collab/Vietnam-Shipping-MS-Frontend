@@ -8,6 +8,7 @@ export default function ContainerList() {
   const [expandedId, setExpandedId] = useState(null);
 
   const [selectedContainers, setSelectedContainers] = useState([]);
+  const [selectedInvoiceNumber, setSelectedInvoiceNumber] = useState("");
   const [showExpenseModal, setShowExpenseModal] = useState(false);
 
   // 🔹 Pagination states
@@ -76,6 +77,7 @@ export default function ContainerList() {
   const closeModal = () => {
     setShowExpenseModal(false);
     setSelectedContainers([]);
+    setSelectedInvoiceNumber("");
   };
 
   return (
@@ -167,7 +169,10 @@ export default function ContainerList() {
                             {selectedContainers.length > 0 && (
                               <button
                                 className="apply-btn bulk"
-                                onClick={() => setShowExpenseModal(true)}
+                                onClick={() => {
+                                  setSelectedInvoiceNumber(s.invoiceNumber);
+                                  setShowExpenseModal(true);
+                                }}
                               >
                                 Add Bulk Expense ({selectedContainers.length})
                               </button>
@@ -215,6 +220,7 @@ export default function ContainerList() {
             <div className="modal-body">
               <ExpenseForm
                 selectedContainerNumbers={selectedContainers}
+                invoiceNumber={selectedInvoiceNumber}
                 onSuccess={closeModal}
               />
             </div>

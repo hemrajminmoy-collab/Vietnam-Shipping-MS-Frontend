@@ -10,6 +10,7 @@ import ExpenseDashboard from "../Dashboard Sections/ExpenseDashboard";
 export default function Dashboard() {
   const [shipments, setShipments] = useState([]);
   const [containers, setContainers] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [stats, setStats] = useState({
     totalVnd: 0,
     totalContainers: 0,
@@ -40,12 +41,40 @@ export default function Dashboard() {
     "ONE",
   ];
 
+  // Format currency helper
+  const formatCurrency = (amount = 0) =>
+    "₫ " + Number(amount).toLocaleString("en-US", { maximumFractionDigits: 0 });
+
+  // Calculate total costs helper
+  const calculateTotal = (costs = []) =>
+    costs.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+
+  // Get per-invoice expense total using invoiceNumber
+  const getInvoiceExpenses = (invoiceNumber) => {
+    let totalExpense = 0;
+    expenses.forEach((e) => {
+      if (e.invoiceNumber === invoiceNumber) {
+        totalExpense += calculateTotal(e.costs);
+      }
+    });
+    return totalExpense;
+  };
+
+  // Calculate price per metric ton for shipment
+  const getPricePerMetricTon = (shipment) => {
+    const netWeight = Number(shipment.netWeight) || 0;
+    const totalValue = Number(shipment.totalValueVnd) || 0;
+    return netWeight > 0 ? (totalValue * 1000) / netWeight : 0;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/shipment/all");
         const res2 = await axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/container/all");
+        const res3 = await axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/expenses/all");
         setContainers(res2.data);
+        setExpenses(res3.data);
         console.log("Fetched Containers:", res2.data);
         setShipments(res.data);
 
@@ -352,7 +381,7 @@ export default function Dashboard() {
       {/* SEARCH AND TABLE SECTION */}
       <div className="table-section">
         <div className="table-header">
-          <h3>Shipment Master Records</h3>
+          <h3>📦 Shipment Master Records</h3>
           <div className="search-bar">
             <Search size={18} />
             <input
@@ -360,6 +389,39 @@ export default function Dashboard() {
               placeholder="Search BL or Invoice..."
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+          </div>
+        </div>
+
+        {/* SUMMARY TOTALS FOR FILTERED SHIPMENTS */}
+        <div style={{ 
+          marginBottom: "16px", 
+          padding: "12px", 
+          backgroundColor: "#f8f9fa", 
+          borderRadius: "8px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "12px"
+        }}>
+          <div style={{ padding: "10px", backgroundColor: "#fff", borderRadius: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.08)", border: "1px solid #e0e0e0" }}>
+            <span style={{ fontSize: "11px", color: "#666", fontWeight: "500" }}>Total Value (VND)</span>
+            <h4 style={{ fontSize: "16px", fontWeight: "bold", color: "#0066cc", margin: "2px 0 0 0" }}>
+              {filteredShipments.reduce((sum, s) => sum + (Number(s.totalValueVnd) || 0), 0).toLocaleString()} ₫
+            </h4>
+          </div>
+
+          <div style={{ padding: "10px", backgroundColor: "#fff", borderRadius: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.08)", border: "1px solid #e0e0e0" }}>
+            <span style={{ fontSize: "11px", color: "#666", fontWeight: "500" }}>Total Expenses (VND)</span>
+            <h4 style={{ fontSize: "16px", fontWeight: "bold", color: "#cc3333", margin: "2px 0 0 0" }}>
+              {filteredShipments.reduce((sum, s) => sum + getInvoiceExpenses(s.invoiceNumber), 0).toLocaleString()} ₫
+            </h4>
+          </div>
+
+          <div style={{ padding: "10px", backgroundColor: "#fff", borderRadius: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.08)", border: "1px solid #e0e0e0" }}>
+            <span style={{ fontSize: "11px", color: "#666", fontWeight: "500" }}>Net Value (After Expenses)</span>
+            <h4 style={{ fontSize: "16px", fontWeight: "bold", color: "#00aa00", margin: "2px 0 0 0" }}>
+              {(filteredShipments.reduce((sum, s) => sum + (Number(s.totalValueVnd) || 0), 0) - 
+                filteredShipments.reduce((sum, s) => sum + getInvoiceExpenses(s.invoiceNumber), 0)).toLocaleString()} ₫
+            </h4>
           </div>
         </div>
 
@@ -374,54 +436,74 @@ export default function Dashboard() {
                 <th>Net Weight</th>
                 <th>ETA</th>
                 <th>Total Value (VND)</th>
+                <th>Expenses (VND)</th>
+                <th>Net Value (VND)</th>
+                <th>Price / MT (USD)</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredShipments.map((shipment) => (
-                <tr key={shipment._id}>
-                  <td className="font-bold">{shipment.invoiceNumber}</td>
-                  <td>{shipment.blNumber}</td>
-                  <td>
-                    <span className="badge">{shipment.goodsName}</span>
-                  </td>
-                  <td>{shipment.containerIds?.length || 0} Units</td>
-                  <td>{shipment.netWeight} Kgs</td>
-                  <td>
-                    {shipment.eta
-                      ? new Date(shipment.eta).toLocaleDateString()
-                      : "N/A"}
-                  </td>
-                  <td className="text-blue font-mono">
-                    {shipment.totalValueVnd?.toLocaleString()} ₫
-                  </td>
-                  <td className="action-cell">
-                    {/* View */}
-                    <button
-                      className="view-btn"
-                      onClick={() => setSelectedShipment(shipment)}
-                    >
-                      <Eye size={16} />
-                    </button>
+              {filteredShipments.map((shipment) => {
+                const invoiceExpenses = getInvoiceExpenses(shipment.invoiceNumber);
+                const netValue = (shipment.totalValueVnd || 0) - invoiceExpenses;
+                const pricePerMT = getPricePerMetricTon(shipment);
+                const EXCHANGE_RATE = 24500;
+                const pricePerMTUSD = pricePerMT / EXCHANGE_RATE;
 
-                    {/* Edit */}
-                    <button
-                      className="edit-btn"
-                      onClick={() => handleEditShipment(shipment)}
-                    >
-                      ✏️
-                    </button>
+                return (
+                  <tr key={shipment._id}>
+                    <td className="font-bold">{shipment.invoiceNumber}</td>
+                    <td>{shipment.blNumber}</td>
+                    <td>
+                      <span className="badge">{shipment.goodsName}</span>
+                    </td>
+                    <td>{shipment.containerIds?.length || 0} Units</td>
+                    <td>{shipment.netWeight} Kgs</td>
+                    <td>
+                      {shipment.eta
+                        ? new Date(shipment.eta).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                    <td className="text-blue font-mono">
+                      {shipment.totalValueVnd?.toLocaleString()} ₫
+                    </td>
+                    <td className="text-red font-mono">
+                      {formatCurrency(invoiceExpenses)}
+                    </td>
+                    <td className="text-green font-mono font-bold">
+                      {formatCurrency(netValue)}
+                    </td>
+                    <td className="text-blue font-mono">
+                      ${pricePerMTUSD.toLocaleString("en-US", { maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="action-cell">
+                      {/* View */}
+                      <button
+                        className="view-btn"
+                        onClick={() => setSelectedShipment(shipment)}
+                      >
+                        <Eye size={16} />
+                      </button>
 
-                    {/* Delete */}
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteShipment(shipment._id)}
-                    >
-                      🗑️
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      {/* Edit */}
+                      <button
+                        className="edit-btn"
+                        onClick={() => handleEditShipment(shipment)}
+                      >
+                        ✏️
+                      </button>
+
+                      {/* Delete */}
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeleteShipment(shipment._id)}
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -453,6 +535,9 @@ export default function Dashboard() {
               </div>
               <div className="info-item">
                 <strong>Port:</strong> {selectedShipment.arrivalPort}
+              </div>
+              <div className="info-item">
+                <strong>From:</strong> {selectedShipment.countryOfOrigin || "-"}
               </div>
               <div className="info-item">
                 <strong>Goods:</strong> {selectedShipment.goodsName}
