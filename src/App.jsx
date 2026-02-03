@@ -91,7 +91,7 @@ function App() {
         {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'create-shipment' && <BulkShipmentForm />}
         {activeTab === 'Expenses' && <ContainerList />}
-        {activeTab === 'warehouse' && <WarehouseSection />}
+        {activeTab === 'Warehouse' && <WarehouseSection />}
       </main>
     </div>
   );
