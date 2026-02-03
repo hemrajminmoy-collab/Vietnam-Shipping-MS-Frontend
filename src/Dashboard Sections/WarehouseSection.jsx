@@ -297,8 +297,6 @@ export default function WarehouseSection() {
               <tr>
                 <td style="padding: 8px; font-weight: bold;">Shipping Line:</td>
                 <td style="padding: 8px;">${shipment.shippingLine || "-"}</td>
-                <td style="padding: 8px; font-weight: bold;">Value:</td>
-                <td style="padding: 8px;">₫ ${Number(shipment.totalValueVnd || shipment.value || 0).toLocaleString()}</td>
               </tr>
             </table>
           </div>
@@ -330,34 +328,6 @@ export default function WarehouseSection() {
             </table>
           </div>
           ` : ""}
-
-          ${invoiceExpenses.length > 0 ? `
-          <div style="margin: 20px 0;">
-            <h3>Expenses</h3>
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
-              <thead>
-                <tr style="background: #f3f4f6;">
-                  <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Cost Type</th>
-                  <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Amount</th>
-                  <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Remarks</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${invoiceExpenses.map(ex => (ex.costs || []).map(c => `
-                <tr>
-                  <td style="padding: 10px; border: 1px solid #ddd;">${c.costType || "-"}</td>
-                  <td style="padding: 10px; border: 1px solid #ddd;">₫ ${Number(c.amount || 0).toLocaleString()}</td>
-                  <td style="padding: 10px; border: 1px solid #ddd;">${ex.remarks || "-"}</td>
-                </tr>
-                `).join("")).join("")}
-              </tbody>
-            </table>
-            <div style="margin-top: 10px; text-align: right; font-weight: bold;">
-              Total Expenses: ₫ ${invoiceExpenses.reduce((s, ex) => s + (ex.costs || []).reduce((ss, c) => ss + Number(c.amount || 0), 0), 0).toLocaleString()}
-            </div>
-          </div>
-          ` : ""}
-
           <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #6b7280; font-size: 12px;">
             <p>Generated on ${new Date().toLocaleString()}</p>
           </div>
@@ -676,10 +646,12 @@ export default function WarehouseSection() {
                 <h4 style={{ marginTop: 0, marginBottom: 12, color: "#1f2937" }}>Container: {selectedContainer.containerNumber}</h4>
                 
                 <label>
-                  Warehouse
+                  Locations 
                   <select value={form.warehouseName} onChange={(e) => handleChange("warehouseName", e.target.value)}>
                     <option>Thanh Binh</option>
                     <option>P & C</option>
+                    <option>CAT LAI PORT</option>
+
                   </select>
                 </label>
 
