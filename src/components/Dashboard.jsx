@@ -10,6 +10,7 @@ import ExpenseDashboard from "../Dashboard Sections/ExpenseDashboard";
 export default function Dashboard() {
   const [shipments, setShipments] = useState([]);
   const [containers, setContainers] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [stats, setStats] = useState({
     totalVnd: 0,
     totalContainers: 0,
@@ -23,29 +24,69 @@ export default function Dashboard() {
   const [editShipment, setEditShipment] = useState(null);
   const [editForm, setEditForm] = useState({});
   const GOODS_OPTIONS = [
-    "Rice",
-    "Wheat",
-    "Sugar",
-    "Maize",
-    "Pulses",
-    "Fertilizer",
+"Rice 5% KOLKATA",
+"Rice 15% KOLKATA",
+"Rice 100% KOLKATA",
+"Rice Reject KOLKATA",
+"Rice 5% CHENNAI",
+"Rice 15% CHENNAI",
+"Rice 100% CHENNAI",
+"DORB GRADE 1 INDIA",
+"DORB GRADE 2 INDIA",
+"DORB NIGERIA",
+"DDGS INDIA",
+"DDGS USA"
+
   ];
 
   const SHIPPING_LINES = [
-    "Maersk",
-    "MSC",
-    "CMA CGM",
-    "Hapag-Lloyd",
-    "COSCO",
-    "ONE",
+"RLC",
+"ONE",
+"COSCO",
+"SAMUDERA",
+"OOCL",
+"MAERSK",
+"ASY AD",
+"CORDELIA",
+"EVERGREEN",
+"GOLD START LINE"
+
   ];
+
+  // Format currency helper
+  const formatCurrency = (amount = 0) =>
+    "₫ " + Number(amount).toLocaleString("en-US", { maximumFractionDigits: 0 });
+
+  // Calculate total costs helper
+  const calculateTotal = (costs = []) =>
+    costs.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+
+  // Get per-invoice expense total using invoiceNumber
+  const getInvoiceExpenses = (invoiceNumber) => {
+    let totalExpense = 0;
+    expenses.forEach((e) => {
+      if (e.invoiceNumber === invoiceNumber) {
+        totalExpense += calculateTotal(e.costs);
+      }
+    });
+    return totalExpense;
+  };
+
+  // Calculate price per metric ton for shipment
+  const getPricePerMetricTon = (shipment) => {
+    const netWeight = Number(shipment.netWeight) || 0;
+    const totalValue = Number(shipment.totalValueVnd) || 0;
+    return netWeight > 0 ? (totalValue * 1000) / netWeight : 0;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/shipment/all");
         const res2 = await axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/container/all");
+        const res3 = await axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/expenses/all");
         setContainers(res2.data);
+        setExpenses(res3.data);
         console.log("Fetched Containers:", res2.data);
         setShipments(res.data);
 
@@ -249,110 +290,125 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      {editShipment && (
-        <div className="modal-overlay" onClick={() => setEditShipment(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Edit Shipment</h3>
-              <button
-                className="close-btn"
-                onClick={() => setEditShipment(null)}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="edit-form-grid">
-              <input
-                name="invoiceNumber"
-                value={editForm.invoiceNumber}
-                onChange={handleEditChange}
-                placeholder="Invoice Number"
-              />
-
-              <input
-                name="blNumber"
-                value={editForm.blNumber}
-                onChange={handleEditChange}
-                placeholder="BL Number"
-              />
-
-              <select
-                name="goodsName"
-                value={editForm.goodsName}
-                onChange={handleEditChange}
-              >
-                <option value="">Select Goods</option>
-                {GOODS_OPTIONS.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                name="shippingLine"
-                value={editForm.shippingLine}
-                onChange={handleEditChange}
-              >
-                <option value="">Select Shipping Line</option>
-                {SHIPPING_LINES.map((line) => (
-                  <option key={line} value={line}>
-                    {line}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                name="arrivalPort"
-                value={editForm.arrivalPort}
-                onChange={handleEditChange}
-                placeholder="Port"
-              />
-
-              <input
-                name="netWeight"
-                value={editForm.netWeight}
-                onChange={handleEditChange}
-                placeholder="Net Weight"
-                type="number"
-              />
-
-              <input
-                name="totalValueVnd"
-                value={editForm.totalValueVnd}
-                onChange={handleEditChange}
-                placeholder="Total Value (VND)"
-                type="number"
-              />
-
-              <input
-                name="eta"
-                value={editForm.eta}
-                onChange={handleEditChange}
-                type="date"
-              />
-            </div>
-
-            <div className="modal-actions">
-              <button className="save-btn" onClick={handleUpdateShipment}>
-                Save Changes
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setEditShipment(null)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
+{editShipment && (
+  <div className="modal-overlay" onClick={() => setEditShipment(null)}>
+    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-header">
+        <div className="header-title">
+          <h3>Edit Shipment</h3>
+          <p>Update the details for this consignment</p>
         </div>
-      )}
+        <button className="close-btn" onClick={() => setEditShipment(null)}>
+          <X size={20} />
+        </button>
+      </div>
+
+      <div className="edit-form-grid">
+        <div className="form-group">
+          <label>Invoice Number</label>
+          <input
+            name="invoiceNumber"
+            value={editForm.invoiceNumber}
+            onChange={handleEditChange}
+            placeholder="INV-001"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>BL Number</label>
+          <input
+            name="blNumber"
+            value={editForm.blNumber}
+            onChange={handleEditChange}
+            placeholder="MAEU123456"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Goods Category</label>
+          <select
+            name="goodsName"
+            value={editForm.goodsName}
+            onChange={handleEditChange}
+          >
+            <option value="">Select Goods</option>
+            {GOODS_OPTIONS.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>Shipping Line</label>
+          <select
+            name="shippingLine"
+            value={editForm.shippingLine}
+            onChange={handleEditChange}
+          >
+            <option value="">Select Shipping Line</option>
+            {SHIPPING_LINES.map((line) => (
+              <option key={line} value={line}>{line}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>Arrival Port</label>
+          <input
+            name="arrivalPort"
+            value={editForm.arrivalPort}
+            onChange={handleEditChange}
+            placeholder="e.g. Cat Lai"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Net Weight (KG)</label>
+          <input
+            name="netWeight"
+            value={editForm.netWeight}
+            onChange={handleEditChange}
+            type="number"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Total Value (VND)</label>
+          <input
+            name="totalValueVnd"
+            value={editForm.totalValueVnd}
+            onChange={handleEditChange}
+            type="number"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Estimated Arrival (ETA)</label>
+          <input
+            name="eta"
+            value={editForm.eta}
+            onChange={handleEditChange}
+            type="date"
+          />
+        </div>
+      </div>
+
+      <div className="modal-actions">
+        <button className="cancel-btn" onClick={() => setEditShipment(null)}>
+          Cancel
+        </button>
+        <button className="save-btn" onClick={handleUpdateShipment}>
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* SEARCH AND TABLE SECTION */}
       <div className="table-section">
         <div className="table-header">
-          <h3>Shipment Master Records</h3>
+          <h3>📦 Shipment Master Records</h3>
           <div className="search-bar">
             <Search size={18} />
             <input
@@ -360,6 +416,39 @@ export default function Dashboard() {
               placeholder="Search BL or Invoice..."
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+          </div>
+        </div>
+
+        {/* SUMMARY TOTALS FOR FILTERED SHIPMENTS */}
+        <div style={{ 
+          marginBottom: "16px", 
+          padding: "12px", 
+          backgroundColor: "#f8f9fa", 
+          borderRadius: "8px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "12px"
+        }}>
+          <div style={{ padding: "10px", backgroundColor: "#fff", borderRadius: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.08)", border: "1px solid #e0e0e0" }}>
+            <span style={{ fontSize: "11px", color: "#666", fontWeight: "500" }}>Total Value (VND)</span>
+            <h4 style={{ fontSize: "16px", fontWeight: "bold", color: "#0066cc", margin: "2px 0 0 0" }}>
+              {filteredShipments.reduce((sum, s) => sum + (Number(s.totalValueVnd) || 0), 0).toLocaleString()} ₫
+            </h4>
+          </div>
+
+          <div style={{ padding: "10px", backgroundColor: "#fff", borderRadius: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.08)", border: "1px solid #e0e0e0" }}>
+            <span style={{ fontSize: "11px", color: "#666", fontWeight: "500" }}>Total Expenses (VND)</span>
+            <h4 style={{ fontSize: "16px", fontWeight: "bold", color: "#cc3333", margin: "2px 0 0 0" }}>
+              {filteredShipments.reduce((sum, s) => sum + getInvoiceExpenses(s.invoiceNumber), 0).toLocaleString()} ₫
+            </h4>
+          </div>
+
+          <div style={{ padding: "10px", backgroundColor: "#fff", borderRadius: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.08)", border: "1px solid #e0e0e0" }}>
+            <span style={{ fontSize: "11px", color: "#666", fontWeight: "500" }}>Net Value (VND)</span>
+            <h4 style={{ fontSize: "16px", fontWeight: "bold", color: "#00aa00", margin: "2px 0 0 0" }}>
+              {(filteredShipments.reduce((sum, s) => sum + (Number(s.totalValueVnd) || 0), 0) + 
+                filteredShipments.reduce((sum, s) => sum + getInvoiceExpenses(s.invoiceNumber), 0)).toLocaleString()} ₫
+            </h4>
           </div>
         </div>
 
@@ -374,54 +463,74 @@ export default function Dashboard() {
                 <th>Net Weight</th>
                 <th>ETA</th>
                 <th>Total Value (VND)</th>
+                <th>Expenses (VND)</th>
+                <th>Net Value (VND)</th>
+                <th>Price / MT (USD)</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredShipments.map((shipment) => (
-                <tr key={shipment._id}>
-                  <td className="font-bold">{shipment.invoiceNumber}</td>
-                  <td>{shipment.blNumber}</td>
-                  <td>
-                    <span className="badge">{shipment.goodsName}</span>
-                  </td>
-                  <td>{shipment.containerIds?.length || 0} Units</td>
-                  <td>{shipment.netWeight} Kgs</td>
-                  <td>
-                    {shipment.eta
-                      ? new Date(shipment.eta).toLocaleDateString()
-                      : "N/A"}
-                  </td>
-                  <td className="text-blue font-mono">
-                    {shipment.totalValueVnd?.toLocaleString()} ₫
-                  </td>
-                  <td className="action-cell">
-                    {/* View */}
-                    <button
-                      className="view-btn"
-                      onClick={() => setSelectedShipment(shipment)}
-                    >
-                      <Eye size={16} />
-                    </button>
+              {filteredShipments.map((shipment) => {
+                const invoiceExpenses = getInvoiceExpenses(shipment.invoiceNumber);
+                const netValue = (Number(shipment.totalValueVnd) || 0) + invoiceExpenses;
+                const pricePerMT = getPricePerMetricTon(shipment);
+                const EXCHANGE_RATE = 24500;
+                const pricePerMTUSD = pricePerMT / EXCHANGE_RATE;
 
-                    {/* Edit */}
-                    <button
-                      className="edit-btn"
-                      onClick={() => handleEditShipment(shipment)}
-                    >
-                      ✏️
-                    </button>
+                return (
+                  <tr key={shipment._id}>
+                    <td className="font-bold">{shipment.invoiceNumber}</td>
+                    <td>{shipment.blNumber}</td>
+                    <td>
+                      <span className="badge">{shipment.goodsName}</span>
+                    </td>
+                    <td>{shipment.containerIds?.length || 0} Units</td>
+                    <td>{shipment.netWeight} Kgs</td>
+                    <td>
+                      {shipment.eta
+                        ? new Date(shipment.eta).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                    <td className="text-blue font-mono">
+                      {shipment.totalValueVnd?.toLocaleString()} ₫
+                    </td>
+                    <td className="text-red font-mono">
+                      {formatCurrency(invoiceExpenses)}
+                    </td>
+                    <td className="text-green font-mono font-bold">
+                      {formatCurrency(netValue)}
+                    </td>
+                    <td className="text-blue font-mono">
+                      ${pricePerMTUSD.toLocaleString("en-US", { maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="action-cell">
+                      {/* View */}
+                      <button
+                        className="view-btn"
+                        onClick={() => setSelectedShipment(shipment)}
+                      >
+                        <Eye size={16} />
+                      </button>
 
-                    {/* Delete */}
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteShipment(shipment._id)}
-                    >
-                      🗑️
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      {/* Edit */}
+                      <button
+                        className="edit-btn"
+                        onClick={() => handleEditShipment(shipment)}
+                      >
+                        ✏️
+                      </button>
+
+                      {/* Delete */}
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeleteShipment(shipment._id)}
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -454,6 +563,7 @@ export default function Dashboard() {
               <div className="info-item">
                 <strong>Port:</strong> {selectedShipment.arrivalPort}
               </div>
+
               <div className="info-item">
                 <strong>Goods:</strong> {selectedShipment.goodsName}
               </div>

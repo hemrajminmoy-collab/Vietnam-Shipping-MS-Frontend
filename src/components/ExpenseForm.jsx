@@ -15,14 +15,17 @@ const COST_TYPES = [
   "Container deposit",
   "Trucking fee",
   "Return empty depo fee",
+  "Inspection Charge",
   "Others",
 ];
 
 export default function ExpenseForm({
   selectedContainerNumbers = [],
+  invoiceNumber = "",
   onSuccess,
 }) {
   const [form, setForm] = useState({
+    invoiceNumber: invoiceNumber,
     expenseDate: "",
     remarks: "",
     costs: [{ costType: "", amount: "" }],
@@ -63,6 +66,11 @@ export default function ExpenseForm({
   const submitExpense = async () => {
     if (submitting) return;
 
+    if (!form.invoiceNumber) {
+      alert("Please select invoice number");
+      return;
+    }
+
     if (!form.expenseDate) {
       alert("Please select expense date");
       return;
@@ -77,6 +85,7 @@ export default function ExpenseForm({
       setSubmitting(true);
 
       await axios.post("https://vietnam-shipping-ms-backend-six.vercel.app/api/expenses/bulk-create", {
+        invoiceNumber: form.invoiceNumber,
         containerNumbers: selectedContainerNumbers,
         expenseDate: form.expenseDate,
         remarks: form.remarks,
@@ -95,6 +104,22 @@ export default function ExpenseForm({
 
   return (
     <div className="expense-container">
+      {/* Invoice Number */}
+      <div className="input-group">
+        <input
+          type="text"
+          className="input-field"
+          value={form.invoiceNumber}
+          onChange={(e) =>
+            setForm({ ...form, invoiceNumber: e.target.value })
+          }
+          placeholder="e.g., INV-001"
+          required
+          readOnly
+        />
+        <label className="floating-label">Invoice Number</label>
+      </div>
+
       {/* Selected Containers */}
       <div className="input-group full-width readonly">
         <textarea

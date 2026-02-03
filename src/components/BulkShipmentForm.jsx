@@ -40,7 +40,6 @@ export default function BulkShipmentForm() {
     eta: "",
     pricePerKgUsd: 0,
     exchangeRate: 24500,
-    countryOfOrigin: "",
   });
 
   //   const [products, setProducts] = useState([]);
@@ -127,7 +126,7 @@ export default function BulkShipmentForm() {
         "https://vietnam-shipping-ms-backend-six.vercel.app/api/shipment/bulk",
         payload,
       );
-      console.log("countryOfOrigin:", shipmentData.countryOfOrigin);
+      // console.log("countryOfOrigin:", shipmentData.countryOfOrigin);
       toast.success("Shipment submitted successfully!", {
         position: "top-right",
         autoClose: 3000,
@@ -314,16 +313,22 @@ export default function BulkShipmentForm() {
               >
                 <option value="">Select Goods</option>
 
-                <option value="Rice 5%">Rice 5%</option>
-                <option value="Rice 15%">Rice 15%</option>
-                <option value="Rice 100%">Rice 100%</option>
-                <option value="Rice Reject">Rice Reject</option>
+                <option value="Rice 5% KOLKATA">Rice 5% KOLKATA</option>
+<option value="Rice 15% KOLKATA">Rice 15% KOLKATA</option>
+<option value="Rice 100% KOLKATA">Rice 100% KOLKATA</option>
+<option value="Rice Reject KOLKATA">Rice Reject KOLKATA</option>
 
-                <option value="DORB">DORB</option>
-                <option value="DORB Grade 1">DORB GRADE 1</option>
-                <option value="DORB Grade 2">DORB GRADE 2</option>
+<option value="Rice 5% CHENNAI">Rice 5% CHENNAI</option>
+<option value="Rice 15% CHENNAI">Rice 15% CHENNAL</option>
+<option value="Rice 100% CHENNAI">Rice 100% CHENNAI</option>
 
-                <option value="DDGS">DDGS</option>
+<option value="DORB GRADE 1 INDIA">DORB GRADE 1 INDIA</option>
+<option value="DORB GRADE 2 INDIA">DORB GRADE 2 INDIA</option>
+<option value="DORB NIGERIA">DORB NIGERIA</option>
+
+<option value="DDGS INDIA">DDGS INDIA</option>
+<option value="DDGS USA">DDGS USA</option>
+
               </select>
 
               {/* Shipping Line Dropdown */}
@@ -338,29 +343,18 @@ export default function BulkShipmentForm() {
                 }
               >
                 <option value="">Select Shipping Line</option>
-                <option value="Maersk">Maersk</option>
-                <option value="MSC">MSC</option>
-                <option value="CMA CGM">CMA CGM</option>
-                <option value="Hapag-Lloyd">Hapag-Lloyd</option>
+                <option value="RLC">RLC</option>
+                <option value="ONE">ONE</option>
+                <option value="COSCO">COSCO</option>
+                <option value="SAMUDERA">SAMUDERA</option>
+                <option value="OOCL">OOCL</option>
+                <option value="MAERSK">MAERSK</option>
+                <option value="ASY AD">ASY AD</option>
+                <option value="CORDELIA">CORDELIA</option>
+                <option value="EVERGREEN">EVERGREEN</option>
+                <option value="GOLD START LINE">GOLD START LINE</option>
               </select>
 
-              <select
-                className="select-field"
-                required
-                value={shipmentData.countryOfOrigin}
-                onChange={(e) =>
-                  setShipmentData({
-                    ...shipmentData,
-                    countryOfOrigin: e.target.value,
-                  })
-                }
-              >
-                <option value="">Select Country</option>
-                <option value="Channai">Channai</option>
-                <option value="INDIA">INDIA</option>
-                <option value="SA CGM">SA</option>
-                <option value="Afica">Afica</option>
-              </select>
 
               {/* <label>Total Gross Weight</label> */}
               <div className="floating-input">

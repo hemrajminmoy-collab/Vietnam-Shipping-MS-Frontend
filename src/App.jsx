@@ -12,6 +12,7 @@ import BulkShipmentForm from './components/BulkShipmentForm';
 import Dashboard from './components/Dashboard';
 import ContainerList from './components/ContainerList';
 import Login from './components/Login';
+import WarehouseSection from './Dashboard Sections/WarehouseSection';
 
 import './App.css';
 
@@ -46,7 +47,8 @@ function App() {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'create-shipment', label: 'Create Shipment', icon: PlusCircle },
-    { id: 'Expenses', label: 'Expenses', icon: Box }
+    { id: 'Expenses', label: 'Expenses', icon: Box },
+    { id: 'warehouse', label: 'warehouse', icon: Box }
   ];
 
   return (
@@ -89,6 +91,7 @@ function App() {
         {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'create-shipment' && <BulkShipmentForm />}
         {activeTab === 'Expenses' && <ContainerList />}
+        {activeTab === 'warehouse' && <WarehouseSection />}
       </main>
     </div>
   );

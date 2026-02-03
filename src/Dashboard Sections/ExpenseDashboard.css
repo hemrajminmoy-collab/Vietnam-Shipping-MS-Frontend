@@ -56,14 +56,40 @@
 /* TABLE */
 .table-wrapper {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 600px;
+  border-radius: 12px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+  border: 1px solid #e5e7eb;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+  border: 2px solid #f9fafb;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .expense-table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border-radius: 12px;
   overflow: hidden;
+  min-width: 1000px;
 }
 
 .expense-table th,
