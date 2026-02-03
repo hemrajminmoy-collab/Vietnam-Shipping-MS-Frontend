@@ -48,16 +48,16 @@ export default function WarehouseSection() {
     setLoading(true);
     try {
       const [sRes, wRes, eRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/shipment/all"),
-        axios.get("http://localhost:5000/api/warehouse/all"),
-        axios.get("http://localhost:5000/api/expenses/all"),
+        axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/shipment/all"),
+        axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/warehouse/all"),
+        axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/expenses/all"),
       ]);
       setShipments(sRes.data || []);
       setRecords(wRes.data || []);
       setExpenses(eRes.data || []);
       // fetch customers too (if endpoint exists)
       try {
-        const cRes = await axios.get("http://localhost:5000/api/customer/all");
+        const cRes = await axios.get("https://vietnam-shipping-ms-backend-six.vercel.app/api/customer/all");
         setCustomers(cRes.data || []);
       } catch (err) {
         // ignore if customer API not present yet
@@ -89,7 +89,7 @@ export default function WarehouseSection() {
         netWeightReceived: Number(form.netWeightReceived || 0),
         receivedDate: form.receivedDate,
       };
-      const res = await axios.post("http://localhost:5000/api/warehouse", payload);
+      const res = await axios.post("https://vietnam-shipping-ms-backend-six.vercel.app/api/warehouse", payload);
       setRecords((prev) => [res.data, ...prev]);
       alert("Warehouse record saved");
     } catch (err) {
@@ -103,7 +103,7 @@ export default function WarehouseSection() {
   const handleDeleteRecord = async (recordId) => {
     if (!window.confirm("Are you sure you want to delete this warehouse record?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/warehouse/${recordId}`);
+      await axios.delete(`https://vietnam-shipping-ms-backend-six.vercel.app/api/warehouse/${recordId}`);
       setRecords((prev) => prev.filter((r) => r._id !== recordId));
       alert("Warehouse record deleted successfully");
     } catch (err) {
@@ -577,7 +577,7 @@ export default function WarehouseSection() {
                         <button className="action-btn" title="Delete" onClick={async () => {
                           if (!window.confirm("Delete this customer record?")) return;
                           try {
-                            await axios.delete(`http://localhost:5000/api/customer/${c._id}`);
+                            await axios.delete(`https://vietnam-shipping-ms-backend-six.vercel.app/api/customer/${c._id}`);
                             setCustomers(prev => prev.filter(x => x._id !== c._id));
                             alert("Customer record deleted");
                           } catch (err) {
@@ -826,8 +826,8 @@ export default function WarehouseSection() {
                         const customerQs = queuedContainers.filter(q => q.sellingDirect && q.saleTarget === "customer");
 
                         const promises = [
-                          ...warehouseQs.map(q => axios.post("http://localhost:5000/api/warehouse", q)),
-                          ...customerQs.map(q => axios.post("http://localhost:5000/api/customer", q)),
+                          ...warehouseQs.map(q => axios.post("https://vietnam-shipping-ms-backend-six.vercel.app/api/warehouse", q)),
+                          ...customerQs.map(q => axios.post("https://vietnam-shipping-ms-backend-six.vercel.app/api/customer", q)),
                         ];
 
                         await Promise.all(promises);

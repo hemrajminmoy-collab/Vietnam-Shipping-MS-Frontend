@@ -46,7 +46,7 @@ export default function ExpenseDashboard() {
   const handleSaveEdit = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/expenses/${editingId}`,
+        `https://vietnam-shipping-ms-backend-six.vercel.app/api/expenses/${editingId}`,
         editForm
       );
       setExpenses((prev) =>
@@ -63,7 +63,7 @@ export default function ExpenseDashboard() {
   const handleDeleteExpense = async (id) => {
     if (!window.confirm("Are you sure you want to delete this expense?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/expenses/${id}`);
+      await axios.delete(`https://vietnam-shipping-ms-backend-six.vercel.app/api/expenses/${id}`);
       setExpenses((prev) => prev.filter((e) => e._id !== id));
       alert("Expense deleted successfully!");
     } catch (err) {
