@@ -516,6 +516,7 @@ export default function WarehouseSection() {
               <table className="warehouse-table">
                 <thead>
                   <tr>
+                    <th>Customer</th>
                     <th>Container No</th>
                     <th>Invoice</th>
                     <th>BL</th>
@@ -523,7 +524,6 @@ export default function WarehouseSection() {
                     <th>Net (kg)</th>
                     <th>Bags</th>
                     {/* <th>Value</th> */}
-                    <th>Customer</th>
                     <th>Received</th>
                     <th>Actions</th>
                   </tr>
@@ -531,6 +531,7 @@ export default function WarehouseSection() {
                 <tbody>
                   {customers.map((c) => (
                     <tr key={c._id}>
+                      <td>{c.customerName}</td>
                       <td>{c.containerNumber}</td>
                       <td>{c.invoiceNumber}</td>
                       <td>{c.blNumber}</td>
@@ -538,7 +539,6 @@ export default function WarehouseSection() {
                       <td>{c.netWeight}</td>
                       <td>{c.numberOfBags}</td>
                       {/* <td>{c.value}</td> */}
-                      <td>{c.customerName}</td>
                       <td>{c.receivedDate ? new Date(c.receivedDate).toLocaleDateString() : ""}</td>
                       <td>
                         <button className="action-btn" title="View" onClick={() => openDetailsForRecord(c)}>👁️</button>
