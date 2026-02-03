@@ -267,8 +267,6 @@ export default function WarehouseSection() {
             <h3>Shipment Information</h3>
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
-                <td style="padding: 8px; font-weight: bold;">Unique ID:</td>
-                <td style="padding: 8px;">${shipment.uniqueId || "-"}</td>
                 <td style="padding: 8px; font-weight: bold;">Invoice Number:</td>
                 <td style="padding: 8px;">${invoice}</td>
               </tr>
