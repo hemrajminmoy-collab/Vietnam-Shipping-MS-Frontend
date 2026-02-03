@@ -48,7 +48,7 @@ function App() {
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'create-shipment', label: 'Create Shipment', icon: PlusCircle },
     { id: 'Expenses', label: 'Expenses', icon: Box },
-    { id: 'warehouse', label: 'warehouse', icon: Box }
+    { id: 'warehouse', label: 'Warehouse', icon: Box }
   ];
 
   return (
@@ -91,7 +91,7 @@ function App() {
         {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'create-shipment' && <BulkShipmentForm />}
         {activeTab === 'Expenses' && <ContainerList />}
-        {activeTab === 'Warehouse' && <WarehouseSection />}
+        {activeTab === 'warehouse' && <WarehouseSection />}
       </main>
     </div>
   );
