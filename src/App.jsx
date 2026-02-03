@@ -13,6 +13,7 @@ import Dashboard from './components/Dashboard';
 import ContainerList from './components/ContainerList';
 import Login from './components/Login';
 import WarehouseSection from './Dashboard Sections/WarehouseSection';
+import { Analytics } from '@vercel/analytics/react';
 
 import './App.css';
 
@@ -93,6 +94,7 @@ function App() {
         {activeTab === 'Expenses' && <ContainerList />}
         {activeTab === 'warehouse' && <WarehouseSection />}
       </main>
+      <Analytics />
     </div>
   );
 }
