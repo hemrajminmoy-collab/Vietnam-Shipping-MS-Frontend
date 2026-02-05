@@ -664,7 +664,7 @@ export default function WarehouseSection() {
                   <label>
                     To
                     <select value={form.saleTarget} onChange={(e) => handleChange("saleTarget", e.target.value)}>
-                      {/* <option value="warehouse">warehouse</option> */}
+                      <option value="warehouse">warehouse</option>
                       <option value="customer">Customer</option>
                     </select>
                   </label>      
