@@ -662,12 +662,12 @@ export default function WarehouseSection() {
 
                 {form.sellingDirect && (
                   <label>
-                    Sell To
+                    To
                     <select value={form.saleTarget} onChange={(e) => handleChange("saleTarget", e.target.value)}>
-                      <option value="customer 1">Customer 1</option>
+                      <option value="warehouse">warehouse</option>
                       <option value="customer">Customer</option>
                     </select>
-                  </label>
+                  </label>      
                 )}
 
                 {form.sellingDirect && form.saleTarget === "customer" && (
