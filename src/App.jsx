@@ -7,6 +7,7 @@ import {
   Box,
   LogOut
 } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 
 import BulkShipmentForm from './components/BulkShipmentForm';
 import Dashboard from './components/Dashboard';
@@ -93,6 +94,7 @@ function App() {
         {activeTab === 'Expenses' && <ContainerList />}
         {activeTab === 'warehouse' && <WarehouseSection />}
       </main>
+      <Analytics />
     </div>
   );
 }
